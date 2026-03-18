@@ -1,0 +1,8 @@
+{
+  "name": "UnityTools.Editor",
+  "references": [
+    "UnityTools.Runtime"
+  ],
+  "includePlatforms": ["Editor"],
+  "rootNamespace": "UnityTools.Editor"
+}
