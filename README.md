@@ -2,6 +2,21 @@ UnityTools is an ongoing side project for utilities I create while working on my
 
 These tools will be stripped to the core, so you'll need to expand on it.
 
+(To expand on it, you'll need to work on the Editor too. For example I have my `Guardian`s that I need to reference,
+```cs
+        [SerializeField] private Guardian guardian;
+        public Guardian Guardian => guardian;
+```
+
+for that to show up, I need to add them in `OnInspectorGUI()`
+
+```cs
+            SerializedProperty guardianProp = serializedObject.FindProperty("guardian");
+            EditorGUILayout.PropertyField(guardianProp);
+```
+
+(Also noting that the `[HideInInspector]` was not necessary as I change my logic since then and it effectively doesn't do anything..)
+
 The first tool I made is a simple Enemy Path script with cool editor design.
 `EnemyPath.cs` is a very basic script to connect waypoints from one and to another which I'm using for my enemies.
 
