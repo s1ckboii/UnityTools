@@ -49,3 +49,8 @@ I made four assets in Figma (I might remake the eye icons) just to give them eve
 
 <img width="260" height="469" alt="image" src="https://github.com/user-attachments/assets/4f374968-d5c8-480c-bebf-92432b498639" />
 <img width="848" height="445" alt="image" src="https://github.com/user-attachments/assets/6797aeac-244b-4140-942a-bca7fd73a6d5" />
+
+Now we also have `EnemyPathGraph`, later I'll rename these two but I'm having some weird behaviours whenever I push new updates so uh... I'll have to fix it first.
+<img width="1417" height="588" alt="image" src="https://github.com/user-attachments/assets/c6418cad-cca1-4906-9660-49268b045616" />
+
+And I'll make a proper readme and move some info to folders so they dont keep piling up this readme. You can disable the discs or the lines seperately or disable both with the graph visible button. Connection is distance based you give it yourself, and if they overlap they connect, if they overlap in a way where the intersection has both midpoints you'll have "perfect" connection (means its green). Though I would not go for that as ai nodes do confuse enemies and also can be performance heavy if done poorly. This is a very basic tool, responsibility lies on you how you use it.
