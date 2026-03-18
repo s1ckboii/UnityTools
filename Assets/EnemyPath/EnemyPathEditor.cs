@@ -5,7 +5,7 @@ namespace UnityTools.EnemyPath
 {
     [CanEditMultipleObjects]
     [CustomEditor(typeof(EnemyPath))]
-    public class EnemyPathLinearEditor : Editor
+    public class EnemyPathEditor : Editor
     {
         private EnemyPath path;
 
