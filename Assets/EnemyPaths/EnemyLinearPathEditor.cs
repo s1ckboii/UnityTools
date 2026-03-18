@@ -1,5 +1,4 @@
-﻿using PlaceholderName.EnemyScripts;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 
