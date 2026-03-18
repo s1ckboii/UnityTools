@@ -6,7 +6,6 @@ namespace UnityTools.EnemyPath
     public class EnemyPath : MonoBehaviour
     {
         [SerializeField] private List<Transform> _waypoints = new List<Transform>();
-        [HideInInspector]
         [SerializeField] private bool _showPath = true;
         public bool ShowPath => _showPath;
 
