@@ -7,7 +7,7 @@ namespace UnityTools.Editor.EnemyPaths
 {
     [CanEditMultipleObjects]
     [CustomEditor(typeof(EnemyLinearPath))]
-    public class EnemyLinearPathEditor : Editor
+    public class EnemyLinearPathEditor : UnityEditor.Editor
     {
         private EnemyLinearPath path;
 
@@ -63,18 +63,18 @@ namespace UnityTools.Editor.EnemyPaths
             return string.Join(" ", input.ToUpper().ToCharArray());
         }
 
-        private readonly System.Collections.Generic.Dictionary<EnemyPath, string> hierarchySignatures = new System.Collections.Generic.Dictionary<EnemyPath, string>();
+        private readonly System.Collections.Generic.Dictionary<EnemyLinearPath, string> hierarchySignatures = new System.Collections.Generic.Dictionary<EnemyLinearPath, string>();
 
         private void OnEnable()
         {
-            path = (EnemyPath)target;
+            path = (EnemyLinearPath)target;
             Refresh();
 
             hierarchySignatures.Clear();
 
             foreach (var t in targets)
             {
-                EnemyPath p = (EnemyPath)t;
+                EnemyLinearPath p = (EnemyLinearPath)t;
                 if (p != null)
                 {
                     hierarchySignatures[p] = GetHierarchySignature(p);
@@ -104,7 +104,7 @@ namespace UnityTools.Editor.EnemyPaths
 
             foreach (var t in targets)
             {
-                EnemyPath p = (EnemyPath)t;
+                EnemyLinearPath p = (EnemyLinearPath)t;
                 if (p == null) continue;
 
                 string newSignature = GetHierarchySignature(p);
@@ -431,7 +431,7 @@ namespace UnityTools.Editor.EnemyPaths
                 }
             }
         }
-        private string GetHierarchySignature(EnemyPath p)
+        private string GetHierarchySignature(EnemyLinearPath p)
         {
             if (p == null) return "";
 
@@ -550,7 +550,7 @@ namespace UnityTools.Editor.EnemyPaths
         {
             foreach (var t in targets)
             {
-                EnemyPath p = (EnemyPath)t;
+                EnemyLinearPath p = (EnemyLinearPath)t;
 
                 var so = new SerializedObject(p);
                 var prop = so.FindProperty("_waypoints");
@@ -568,7 +568,7 @@ namespace UnityTools.Editor.EnemyPaths
             }
         }
 
-        public static void DrawPath(EnemyPath path)
+        public static void DrawPath(EnemyLinearPath path)
         {
             if (path == null || path.Count == 0 || !path.ShowPath)
                 return;
@@ -598,7 +598,7 @@ namespace UnityTools.Editor.EnemyPaths
             }
         }
 
-        private static void DrawSegment(EnemyPath path, Vector3 start, Vector3 end, int index, float time)
+        private static void DrawSegment(EnemyLinearPath path, Vector3 start, Vector3 end, int index, float time)
         {
             float tColor = index / (float)(path.Count - 1);
 
@@ -640,13 +640,13 @@ namespace UnityTools.Editor.EnemyPaths
 
         private static void OnSceneGUI(SceneView sceneView)
         {
-            var paths = Object.FindObjectsByType<EnemyPath>(FindObjectsSortMode.None);
+            var paths = Object.FindObjectsByType<EnemyLinearPath>(FindObjectsSortMode.None);
 
             Handles.color = Color.yellow;
 
             foreach (var path in paths)
             {
-                EnemyPathEditor.DrawPath(path);
+                EnemyLinearPathEditor.DrawPath(path);
             }
         }
     }
