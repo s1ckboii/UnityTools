@@ -13,5 +13,3 @@ You CAN use these scripts on their own, but I highly suggest to expand on them s
 All of these code is fully FREE to use, even the small icons.
 
 If you have any suggestions what to add, let me know and I'll think about it. You are also free to PR new additions, or improved versions of existing components.
-
-This is a cool test
