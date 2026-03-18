@@ -1,4 +1,4 @@
-UnityTools is an ongoing side project utilities I create while working on my multiplayer towerdefense game.
+UnityTools is an ongoing side project for utilities I create while working on my multiplayer fps towerdefense game.
 
 These tools will be stripped to the core, so you'll need to expand on it.
 
