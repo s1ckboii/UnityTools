@@ -3,26 +3,22 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.37027.9
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EnemyPath", "EnemyPath", "{E384EF84-AAE2-4C2D-8A97-BCF2C6D72BEC}"
-	ProjectSection(SolutionItems) = preProject
-		EnemyPath.cs = EnemyPath.cs
-		EnemyPathEditor.cs = EnemyPathEditor.cs
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Assets", "Assets", "{FA392CE9-958F-4AAB-B804-74780A61AA73}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EnemyPaths", "EnemyPaths", "{E384EF84-AAE2-4C2D-8A97-BCF2C6D72BEC}"
+	ProjectSection(SolutionItems) = preProject
+		Assets\EnemyPaths\EnemyLinearPath.cs = Assets\EnemyPaths\EnemyLinearPath.cs
+		Assets\EnemyPaths\EnemyLinearPathEditor.cs = Assets\EnemyPaths\EnemyLinearPathEditor.cs
+		Assets\EnemyPaths\EnemyPathGraph.cs = Assets\EnemyPaths\EnemyPathGraph.cs
+		Assets\EnemyPaths\EnemyPathGraphEditor.cs = Assets\EnemyPaths\EnemyPathGraphEditor.cs
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Icons", "Icons", "{B30692DF-A257-41DE-8202-3097CC96E328}"
 	ProjectSection(SolutionItems) = preProject
-		..\..\Unity-projects\Project RF\Assets\Editor\Icons\eye_closed.png = ..\..\Unity-projects\Project RF\Assets\Editor\Icons\eye_closed.png
-		..\..\Unity-projects\Project RF\Assets\Editor\Icons\eye_open.png = ..\..\Unity-projects\Project RF\Assets\Editor\Icons\eye_open.png
-		..\..\Unity-projects\Project RF\Assets\Editor\Icons\lock_locked.png = ..\..\Unity-projects\Project RF\Assets\Editor\Icons\lock_locked.png
-		..\..\Unity-projects\Project RF\Assets\Editor\Icons\lock_unlocked.png = ..\..\Unity-projects\Project RF\Assets\Editor\Icons\lock_unlocked.png
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EnemyPathGraph", "EnemyPathGraph", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
-	ProjectSection(SolutionItems) = preProject
-		EnemyPathGraph.cs = EnemyPathGraph.cs
-		EnemyPathGraphEditor.cs = EnemyPathGraphEditor.cs
+		Assets\Icons\eye_closed.png = Assets\Icons\eye_closed.png
+		Assets\Icons\eye_open.png = Assets\Icons\eye_open.png
+		Assets\Icons\lock_locked.png = Assets\Icons\lock_locked.png
+		Assets\Icons\lock_unlocked.png = Assets\Icons\lock_unlocked.png
 	EndProjectSection
 EndProject
 Global
@@ -32,9 +28,5 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{E384EF84-AAE2-4C2D-8A97-BCF2C6D72BEC} = {FA392CE9-958F-4AAB-B804-74780A61AA73}
 		{B30692DF-A257-41DE-8202-3097CC96E328} = {FA392CE9-958F-4AAB-B804-74780A61AA73}
-		{02EA681E-C7D8-13C7-8484-4AC65E1B71E8} = {FA392CE9-958F-4AAB-B804-74780A61AA73}
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {052428AB-5A23-4488-A191-445A87357924}
 	EndGlobalSection
 EndGlobal
