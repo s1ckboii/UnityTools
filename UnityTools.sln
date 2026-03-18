@@ -7,6 +7,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EnemyPath", "EnemyPath", "{
 	ProjectSection(SolutionItems) = preProject
 		EnemyPath.cs = EnemyPath.cs
 		EnemyPathEditor.cs = EnemyPathEditor.cs
+		EnemyPathGraph.cs = EnemyPathGraph.cs
+		EnemyPathGraphEditor.cs = EnemyPathGraphEditor.cs
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Assets", "Assets", "{FA392CE9-958F-4AAB-B804-74780A61AA73}"
