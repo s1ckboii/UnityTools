@@ -2,6 +2,10 @@ UnityTools is an ongoing side project for utilities I create while working on my
 
 These tools will be stripped to the core, so you'll need to expand on it.
 
+The reason why the editortool here is so useful is mainly because you can just simply create a prefab of a waypoint / ainode whatever you call it,
+and then just drag on drop into the scene, it'll align perfectly on the surface and once you are done with all, you can just select them all and place them in a parent object,
+which has the `EnemyPath` script on it. You won't need to worry about their Y-axis anymore, you also get a clear view on how they would move at all times, not just when selected.
+
 (To expand on it, you'll need to work on the Editor too. For example I have my `Guardian`s that I need to reference,
 ```cs
         [SerializeField] private Guardian guardian;
