@@ -15,7 +15,7 @@ for that to show up, I need to add them in `OnInspectorGUI()`
             EditorGUILayout.PropertyField(guardianProp);
 ```
 
-(Also noting that the `[HideInInspector]` was not necessary as I change my logic since then and it effectively doesn't do anything..)
+(Also noting that the `[HideInInspector]` was not necessary as I changed my logic since then and it effectively doesn't do anything..)
 
 The first tool I made is a simple Enemy Path script with cool editor design.
 `EnemyPath.cs` is a very basic script to connect waypoints from one and to another which I'm using for my enemies.
