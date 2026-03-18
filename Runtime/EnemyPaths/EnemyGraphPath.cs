@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace UnityTools.EnemyPaths
+namespace UnityTools.Runtime.EnemyPaths
 {
     [System.Serializable]
     public class WaypointNode

@@ -1,49 +1,25 @@
 ﻿using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
+using UnityTools.Runtime.EnemyPaths;
 
-namespace UnityTools.EnemyPaths
+namespace UnityTools.Editor.EnemyPaths
 {
     [CanEditMultipleObjects]
-    [CustomEditor(typeof(EnemyGraphPath))]
-    public class EnemyGraphPathEditor : Editor
+    [CustomEditor(typeof(EnemyLinearPath))]
+    public class EnemyLinearPathEditor : Editor
     {
-        private EnemyGraphPath graph;
+        private EnemyLinearPathPath path;
 
         private Texture2D iconEyeOn;
         private Texture2D iconEyeOff;
         private Texture2D iconLockLocked;
         private Texture2D iconLockUnlocked;
 
-        private ReorderableList nodeList;
+        private ReorderableList waypointList;
 
-        private static readonly string ShowGraphKey = "EnemyPathGraph_ShowGraph";
-        private static readonly string LockNodesKey = "EnemyPathGraph_LockNodes";
-        private static readonly string ShowDiscsKey = "EnemyPathGraph_ShowDiscs";
-        private static readonly string ShowLinesKey = "EnemyPathGraph_ShowLines";
-        private static readonly string ThemeKey = "EnemyPathGraphEditor_ThemeColor";
-        private static bool ShowGraph
-        {
-            get => EditorPrefs.GetBool(ShowGraphKey, true);
-            set => EditorPrefs.SetBool(ShowGraphKey, value);
-        }
+        private static readonly string ThemeKey = "EnemyPathEditor_ThemeColor";
 
-        private static bool LockNodes
-        {
-            get => EditorPrefs.GetBool(LockNodesKey, true);
-            set => EditorPrefs.SetBool(LockNodesKey, value);
-        }
-        private static bool ShowDiscs
-        {
-            get => EditorPrefs.GetBool(ShowDiscsKey, true);
-            set => EditorPrefs.SetBool(ShowDiscsKey, value);
-        }
-
-        private static bool ShowLines
-        {
-            get => EditorPrefs.GetBool(ShowLinesKey, true);
-            set => EditorPrefs.SetBool(ShowLinesKey, value);
-        }
         private static Color ThemeColor
         {
             get
@@ -73,7 +49,6 @@ namespace UnityTools.EnemyPaths
                 float.Parse(parts[3])
             );
         }
-
         private static Color GetContrastColor(Color c)
         {
             float luminance = (0.299f * c.r + 0.587f * c.g + 0.114f * c.b);
@@ -83,28 +58,26 @@ namespace UnityTools.EnemyPaths
 
             return Color.white;
         }
-
         private string AddSpacing(string input)
         {
             return string.Join(" ", input.ToUpper().ToCharArray());
         }
 
-        private readonly System.Collections.Generic.Dictionary<EnemyPathGraph, string> hierarchySignatures =
-            new System.Collections.Generic.Dictionary<EnemyPathGraph, string>();
+        private readonly System.Collections.Generic.Dictionary<EnemyPath, string> hierarchySignatures = new System.Collections.Generic.Dictionary<EnemyPath, string>();
 
         private void OnEnable()
         {
-            graph = (EnemyPathGraph)target;
+            path = (EnemyPath)target;
             Refresh();
 
             hierarchySignatures.Clear();
 
             foreach (var t in targets)
             {
-                EnemyPathGraph g = (EnemyPathGraph)t;
-                if (g != null)
+                EnemyPath p = (EnemyPath)t;
+                if (p != null)
                 {
-                    hierarchySignatures[g] = GetHierarchySignature(g);
+                    hierarchySignatures[p] = GetHierarchySignature(p);
                 }
             }
 
@@ -114,40 +87,38 @@ namespace UnityTools.EnemyPaths
             iconLockLocked = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Editor/Icons/lock_locked.png");
             iconLockUnlocked = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Editor/Icons/lock_unlocked.png");
 
-            SerializedProperty nodesProp = serializedObject.FindProperty("_nodes");
-            SetupNodeList(nodesProp);
+            SerializedProperty waypointsProp = serializedObject.FindProperty("_waypoints");
+            SetupWaypointList(waypointsProp);
 
             EditorApplication.hierarchyChanged += OnHierarchyChanged;
         }
-
         private void OnDisable()
         {
             EditorApplication.hierarchyChanged -= OnHierarchyChanged;
-            if (nodeList != null)
-                nodeList.index = -1;
+            if (waypointList != null)
+                waypointList.index = -1;
         }
-
         private void OnHierarchyChanged()
         {
             bool needsRefresh = false;
 
             foreach (var t in targets)
             {
-                EnemyPathGraph g = (EnemyPathGraph)t;
-                if (g == null) continue;
+                EnemyPath p = (EnemyPath)t;
+                if (p == null) continue;
 
-                string newSignature = GetHierarchySignature(g);
+                string newSignature = GetHierarchySignature(p);
 
-                if (!hierarchySignatures.TryGetValue(g, out string oldSignature))
+                if (!hierarchySignatures.TryGetValue(p, out string oldSignature))
                 {
-                    hierarchySignatures[g] = newSignature;
+                    hierarchySignatures[p] = newSignature;
                     needsRefresh = true;
                     continue;
                 }
 
                 if (newSignature != oldSignature)
                 {
-                    hierarchySignatures[g] = newSignature;
+                    hierarchySignatures[p] = newSignature;
                     needsRefresh = true;
                 }
             }
@@ -163,15 +134,12 @@ namespace UnityTools.EnemyPaths
         {
             serializedObject.Update();
 
-            SerializedProperty nodesProp = serializedObject.FindProperty("_nodes");
-            bool lockValue = LockNodes;
-            SerializedProperty distProp = serializedObject.FindProperty("_connectionDistance");
+            SerializedProperty waypointsProp = serializedObject.FindProperty("_waypoints");
+            SerializedProperty lockProp = serializedObject.FindProperty("_lockWaypoints");
 
-            EditorGUILayout.PropertyField(distProp);
-
-            DrawNodeInfo();
-            DrawNodeLock();
-            DrawNodeList(nodesProp);
+            DrawWaypointInfo(lockProp);
+            DrawWaypointLock(lockProp);
+            DrawWaypointList(waypointsProp, lockProp);
 
             if (Event.current.type == EventType.MouseDown)
             {
@@ -179,7 +147,7 @@ namespace UnityTools.EnemyPaths
 
                 if (!listRect.Contains(Event.current.mousePosition))
                 {
-                    nodeList.index = -1;
+                    waypointList.index = -1;
                     Repaint();
                 }
             }
@@ -202,51 +170,52 @@ namespace UnityTools.EnemyPaths
             serializedObject.ApplyModifiedProperties();
         }
 
-        private void SetupNodeList(SerializedProperty nodesProp)
+        private void SetupWaypointList(SerializedProperty waypointsProp)
         {
-            nodeList = new ReorderableList(serializedObject, nodesProp, true, true, false, false);
+            waypointList = new ReorderableList(serializedObject, waypointsProp, true, true, false, false);
 
-            nodeList.drawHeaderCallback = rect =>
+            waypointList.drawHeaderCallback = rect =>
             {
-                EditorGUI.LabelField(rect, "Nodes");
+                EditorGUI.LabelField(rect, "Waypoints");
             };
 
-            nodeList.drawElementCallback = (rect, index, active, focused) =>
+            waypointList.drawElementCallback = (rect, index, active, focused) =>
             {
-                DrawNodeElement(rect, index, active);
+                DrawWaypointElement(rect, index, active);
             };
 
-            nodeList.drawElementBackgroundCallback = (rect, index, active, focused) =>
+            waypointList.drawElementBackgroundCallback = (rect, index, active, focused) =>
             {
-                DrawNodeBackground(rect, index, active);
+                DrawWaypointBackground(rect, index, active);
             };
 
-            nodeList.onReorderCallback = list =>
+            waypointList.onReorderCallback = list =>
             {
                 serializedObject.ApplyModifiedProperties();
                 ReorderChildren(list.serializedProperty);
             };
         }
 
-        private void DrawNodeInfo()
+        private void DrawWaypointInfo(SerializedProperty lockProp)
         {
-            EditorGUILayout.HelpBox(LockNodes
-                    ? "Nodes are auto-synced from child objects. Modify the hierarchy to change the graph."
-                    : "Manual mode: reorder nodes here to update child object order.",
+            EditorGUILayout.HelpBox(
+                lockProp.boolValue
+                    ? "Waypoints are auto-synced from child objects. Modify the hierarchy to change the path."
+                    : "Manual mode: reorder waypoints here to update child object order.",
                 MessageType.Info
             );
 
             EditorGUILayout.Space(5);
         }
 
-        private void DrawNodeLock()
+        private void DrawWaypointLock(SerializedProperty lockProp)
         {
             Rect full = GUILayoutUtility.GetRect(0, 30, GUILayout.ExpandWidth(true));
 
             float labelWidth = EditorGUIUtility.labelWidth;
 
             Rect labelRect = new Rect(full.x, full.y, labelWidth, full.height);
-            EditorGUI.LabelField(labelRect, "Nodes");
+            EditorGUI.LabelField(labelRect, "Waypoints");
 
             float remainingWidth = full.width - labelWidth;
             float buttonWidth = Mathf.Clamp(remainingWidth, 160f, 320f);
@@ -260,7 +229,7 @@ namespace UnityTools.EnemyPaths
 
             bool hovered = rect.Contains(Event.current.mousePosition);
 
-            bool isLocked = LockNodes;
+            bool isLocked = lockProp.boolValue;
 
             Color top = isLocked
                 ? new Color(0.70f, 0.35f, 0.35f)
@@ -305,7 +274,6 @@ namespace UnityTools.EnemyPaths
                 fontSize = 14,
                 normal = { textColor = textColor }
             };
-
             if (icon != null)
             {
                 float iconSize = Mathf.Min(24f, contentRect.height - 6f);
@@ -334,7 +302,7 @@ namespace UnityTools.EnemyPaths
 
             if (Event.current.type == EventType.MouseDown && rect.Contains(Event.current.mousePosition))
             {
-                LockNodes = !LockNodes;
+                lockProp.boolValue = !lockProp.boolValue;
                 serializedObject.ApplyModifiedProperties();
                 Event.current.Use();
             }
@@ -357,23 +325,25 @@ namespace UnityTools.EnemyPaths
             GUI.color = prev;
         }
 
-        private void DrawNodeList(SerializedProperty nodesProp)
+        private void DrawWaypointList(SerializedProperty waypointsProp, SerializedProperty lockProp)
         {
-            EditorGUI.BeginDisabledGroup(LockNodes);
-            nodeList.DoLayoutList();
+            EditorGUI.BeginDisabledGroup(lockProp.boolValue);
+
+            waypointList.DoLayoutList();
+
             EditorGUI.EndDisabledGroup();
         }
 
-        private void DrawNodeElement(Rect rect, int index, bool active)
+        private void DrawWaypointElement(Rect rect, int index, bool active)
         {
-            SerializedProperty element = nodeList.serializedProperty.GetArrayElementAtIndex(index);
+            SerializedProperty element = waypointList.serializedProperty.GetArrayElementAtIndex(index);
 
             rect.y += 2;
 
             Rect indexRect = new Rect(rect.x + 6, rect.y, 28, EditorGUIUtility.singleLineHeight);
             Rect fieldRect = new Rect(rect.x + 38, rect.y, rect.width - 44, EditorGUIUtility.singleLineHeight);
 
-            bool isLocked = LockNodes;
+            bool isLocked = serializedObject.FindProperty("_lockWaypoints").boolValue;
 
             Color baseColor = active ? ThemeColor : new Color(0.25f, 0.25f, 0.25f);
             Color textColor = GetContrastColor(baseColor);
@@ -403,10 +373,9 @@ namespace UnityTools.EnemyPaths
 
             GUI.color = prev;
         }
-
-        private void DrawNodeBackground(Rect rect, int index, bool active)
+        private void DrawWaypointBackground(Rect rect, int index, bool active)
         {
-            bool isLocked = LockNodes;
+            bool isLocked = serializedObject.FindProperty("_lockWaypoints").boolValue;
 
             Color top;
             Color bottom;
@@ -449,11 +418,11 @@ namespace UnityTools.EnemyPaths
             Handles.EndGUI();
         }
 
-        private void ReorderChildren(SerializedProperty nodesProp)
+        private void ReorderChildren(SerializedProperty waypointsProp)
         {
-            for (int i = 0; i < nodesProp.arraySize; i++)
+            for (int i = 0; i < waypointsProp.arraySize; i++)
             {
-                var element = nodesProp.GetArrayElementAtIndex(i);
+                var element = waypointsProp.GetArrayElementAtIndex(i);
                 Transform t = element.objectReferenceValue as Transform;
 
                 if (t != null)
@@ -462,16 +431,15 @@ namespace UnityTools.EnemyPaths
                 }
             }
         }
-
-        private string GetHierarchySignature(EnemyPathGraph g)
+        private string GetHierarchySignature(EnemyPath p)
         {
-            if (g == null) return "";
+            if (p == null) return "";
 
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
-            for (int i = 0; i < g.transform.childCount; i++)
+            for (int i = 0; i < p.transform.childCount; i++)
             {
-                Transform child = g.transform.GetChild(i);
+                Transform child = p.transform.GetChild(i);
                 sb.Append(child.GetInstanceID());
                 sb.Append("|");
             }
@@ -483,11 +451,12 @@ namespace UnityTools.EnemyPaths
         {
             EditorGUILayout.Space(10);
 
-            bool showGraph = ShowGraph;
+            SerializedProperty showProp = serializedObject.FindProperty("_showPath");
 
             Rect full = GUILayoutUtility.GetRect(0, 30, GUILayout.ExpandWidth(true));
 
             float labelWidth = EditorGUIUtility.labelWidth;
+
 
             Rect labelRect = new Rect(full.x, full.y, labelWidth, full.height);
             EditorGUI.LabelField(labelRect, "Visualization");
@@ -499,15 +468,15 @@ namespace UnityTools.EnemyPaths
 
             bool hovered = rect.Contains(Event.current.mousePosition);
 
-            Color baseColor = showGraph
+            Color baseColor = showProp.boolValue
                 ? ThemeColor
                 : new Color(0.32f, 0.32f, 0.32f);
 
-            Color top = showGraph
+            Color top = showProp.boolValue
                 ? baseColor
                 : new Color(0.32f, 0.32f, 0.32f);
 
-            Color bottom = showGraph
+            Color bottom = showProp.boolValue
                 ? baseColor * 0.6f
                 : new Color(0.18f, 0.18f, 0.18f);
 
@@ -531,7 +500,7 @@ namespace UnityTools.EnemyPaths
 
             Rect contentRect = new Rect(rect.x + 8, rect.y, rect.width - 16, rect.height);
 
-            Texture icon = showGraph ? iconEyeOn : iconEyeOff;
+            Texture icon = showProp.boolValue ? iconEyeOn : iconEyeOff;
 
             Color textColor = GetContrastColor(baseColor);
 
@@ -561,70 +530,17 @@ namespace UnityTools.EnemyPaths
                 GUI.color = prev;
 
                 Rect textRect = new Rect(contentRect.x + iconSize + 6, contentRect.y, contentRect.width - iconSize - 6, contentRect.height);
-                DrawTextWithOutline(textRect, AddSpacing(showGraph ? "Graph Visible" : "Graph Hidden"), textStyle, textColor);
+                DrawTextWithOutline(textRect, AddSpacing(showProp.boolValue ? "Path Visible" : "Path Hidden"), textStyle, textColor);
             }
             else
             {
-                EditorGUI.LabelField(contentRect, showGraph ? "Graph Visible" : "Graph Hidden", textStyle);
+                EditorGUI.LabelField(contentRect, showProp.boolValue ? "Path Visible" : "Path Hidden", textStyle);
             }
 
             if (Event.current.type == EventType.MouseDown && rect.Contains(Event.current.mousePosition))
             {
-                ShowGraph = !ShowGraph;
-                SceneView.RepaintAll();
-                Event.current.Use();
-            }
-
-            EditorGUILayout.Space(5);
-
-            Rect row = GUILayoutUtility.GetRect(0, 28, GUILayout.ExpandWidth(true));
-
-            float startX = row.x + labelWidth + (remainingWidth - buttonWidth) * 0.5f;
-
-            float half = (buttonWidth - 6f) * 0.5f;
-
-            Rect left = new Rect(startX, row.y, half, row.height);
-            Rect right = new Rect(startX + half + 6f, row.y, half, row.height);
-
-            DrawMiniToggle(left, () => ShowDiscs, v => ShowDiscs = v, "Discs");
-            DrawMiniToggle(right, () => ShowLines, v => ShowLines = v, "Lines");
-        }
-
-        private void DrawMiniToggle(Rect rect, System.Func<bool> getter, System.Action<bool> setter, string label)
-        {
-            bool value = getter();
-
-            bool hovered = rect.Contains(Event.current.mousePosition);
-
-            Color baseColor = value ? ThemeColor : new Color(0.28f, 0.28f, 0.28f);
-
-            Color top = value ? baseColor : new Color(0.28f, 0.28f, 0.28f);
-            Color bottom = value ? baseColor * 0.6f : new Color(0.16f, 0.16f, 0.16f);
-
-            if (hovered)
-            {
-                top *= 1.1f;
-                bottom *= 1.1f;
-            }
-
-            EditorGUI.DrawRect(rect, bottom);
-            EditorGUI.DrawRect(new Rect(rect.x, rect.y, rect.width, rect.height * 0.5f), top);
-
-            Color textColor = GetContrastColor(baseColor);
-
-            GUIStyle style = new GUIStyle(EditorStyles.label)
-            {
-                alignment = TextAnchor.MiddleCenter,
-                fontStyle = FontStyle.Bold,
-                fontSize = 12,
-                normal = { textColor = textColor }
-            };
-
-            DrawTextWithOutline(rect, label.ToUpper(), style, textColor);
-
-            if (Event.current.type == EventType.MouseDown && rect.Contains(Event.current.mousePosition))
-            {
-                setter(!value);
+                showProp.boolValue = !showProp.boolValue;
+                serializedObject.ApplyModifiedProperties();
                 SceneView.RepaintAll();
                 Event.current.Use();
             }
@@ -634,51 +550,34 @@ namespace UnityTools.EnemyPaths
         {
             foreach (var t in targets)
             {
-                EnemyPathGraph g = (EnemyPathGraph)t;
+                EnemyPath p = (EnemyPath)t;
 
-                var so = new SerializedObject(g);
-                var prop = so.FindProperty("_nodes");
+                var so = new SerializedObject(p);
+                var prop = so.FindProperty("_waypoints");
 
                 prop.ClearArray();
 
-                for (int i = 0; i < g.transform.childCount; i++)
+                for (int i = 0; i < p.transform.childCount; i++)
                 {
                     prop.InsertArrayElementAtIndex(i);
                     prop.GetArrayElementAtIndex(i).objectReferenceValue =
-                        g.transform.GetChild(i);
+                        p.transform.GetChild(i);
                 }
 
                 so.ApplyModifiedProperties();
             }
         }
 
-        public static void DrawGraph(EnemyPathGraph graph)
+        public static void DrawPath(EnemyPath path)
         {
-            if (graph == null || graph.Count == 0 || !ShowGraph)
+            if (path == null || path.Count == 0 || !path.ShowPath)
                 return;
 
-            float dist = graph.ConnectionDistance;
+            float time = (float)EditorApplication.timeSinceStartup * 0.5f;
 
-            for (int i = 0; i < graph.Count; i++)
+            for (int i = 0; i < path.Count; i++)
             {
-                Transform node = graph.GetNode(i);
-                if (node == null) continue;
-
-                Vector3 pos = node.position;
-
-                Color theme = ThemeColor;
-
-                Color discFill = new Color(theme.r, theme.g, theme.b, 0.08f);
-                Color discWire = new Color(theme.r, theme.g, theme.b, 0.6f);
-
-                if (ShowDiscs)
-                {
-                    Handles.color = discFill;
-                    Handles.DrawSolidDisc(pos, Vector3.up, dist);
-
-                    Handles.color = discWire;
-                    Handles.DrawWireDisc(pos, Vector3.up, dist);
-                }
+                Vector3 pos = path.GetWaypoint(i);
 
                 Handles.color = Color.yellow;
                 Handles.SphereHandleCap(
@@ -689,59 +588,65 @@ namespace UnityTools.EnemyPaths
                     EventType.Repaint
                 );
 
-                if (!ShowLines)
+                if (i >= path.Count - 1)
                     continue;
 
-                for (int j = i + 1; j < graph.Count; j++)
-                {
-                    Transform other = graph.GetNode(j);
-                    if (other == null) continue;
+                Vector3 start = pos;
+                Vector3 end = path.GetWaypoint(i + 1);
 
-                    float d = Vector3.Distance(pos, other.position);
+                DrawSegment(path, start, end, i, time);
+            }
+        }
 
-                    if (d <= dist * 2f)
-                    {
-                        Color baseColor;
+        private static void DrawSegment(EnemyPath path, Vector3 start, Vector3 end, int index, float time)
+        {
+            float tColor = index / (float)(path.Count - 1);
 
-                        if (d <= dist)
-                        {
-                            float t = d / dist;
-                            baseColor = Color.Lerp(Color.green, Color.yellow, t);
-                        }
-                        else
-                        {
-                            float t = (d - dist) / dist;
-                            baseColor = Color.Lerp(Color.yellow, Color.red, t);
-                        }
+            Color baseColor = Color.Lerp(new Color(0.3f, 0.8f, 0.3f), new Color(0.9f, 0.3f, 0.3f), tColor);
 
-                        Handles.color = baseColor;
-                        Handles.DrawAAPolyLine(3f, pos, other.position);
-                    }
-                }
+            Handles.color = baseColor;
+            Handles.DrawAAPolyLine(3f, start, end);
+
+            int segments = 1;
+
+            for (int s = 0; s < segments; s++)
+            {
+                float t = (s / (float)segments + time) % 1f;
+
+                Vector3 point = Vector3.Lerp(start, end, t);
+
+                float size = HandleUtility.GetHandleSize(point) * 0.04f;
+
+                float fade = Mathf.Sin(t * Mathf.PI);
+                Handles.color = new Color(baseColor.r, baseColor.g, baseColor.b, fade * 0.6f);
+
+                Handles.SphereHandleCap(0, point, Quaternion.identity, size, EventType.Repaint);
             }
         }
 
         private void OnSceneGUI()
         {
-            DrawGraph(graph);
+            DrawPath(path);
         }
     }
 
     [InitializeOnLoad]
-    public static class EnemyPathGraphSceneDrawer
+    public static class EnemyPathSceneDrawer
     {
-        static EnemyPathGraphSceneDrawer()
+        static EnemyPathSceneDrawer()
         {
             SceneView.duringSceneGui += OnSceneGUI;
         }
 
         private static void OnSceneGUI(SceneView sceneView)
         {
-            var graphs = Object.FindObjectsByType<EnemyPathGraph>(FindObjectsSortMode.None);
+            var paths = Object.FindObjectsByType<EnemyPath>(FindObjectsSortMode.None);
 
-            foreach (var graph in graphs)
+            Handles.color = Color.yellow;
+
+            foreach (var path in paths)
             {
-                EnemyPathGraphEditor.DrawGraph(graph);
+                EnemyPathEditor.DrawPath(path);
             }
         }
     }
