@@ -1,0 +1,23 @@
+﻿using System.Collections.Generic;
+using UnityEngine;
+
+namespace UnityTools.EnemyPath
+{
+    public class EnemyPath : MonoBehaviour
+    {
+        [SerializeField] private List<Transform> _waypoints = new List<Transform>();
+        [HideInInspector]
+        [SerializeField] private bool _showPath = true;
+        public bool ShowPath => _showPath;
+
+        public int Count => _waypoints.Count;
+
+        public Vector3 GetWaypoint(int index)
+        {
+            if (index < 0 || index >= _waypoints.Count)
+                return transform.position;
+
+            return _waypoints[index].position;
+        }
+    }
+}
