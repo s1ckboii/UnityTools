@@ -9,7 +9,7 @@ namespace UnityTools.Editor.EnemyPaths
     [CustomEditor(typeof(EnemyLinearPath))]
     public class EnemyLinearPathEditor : Editor
     {
-        private EnemyLinearPathPath path;
+        private EnemyLinearPath path;
 
         private Texture2D iconEyeOn;
         private Texture2D iconEyeOff;
