@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace UnityTools.EnemyPath
 {
-    public class EnemyPath : MonoBehaviour
+    public class EnemyPathLinear : MonoBehaviour
     {
         [SerializeField] private List<Transform> _waypoints = new List<Transform>();
         [HideInInspector]
