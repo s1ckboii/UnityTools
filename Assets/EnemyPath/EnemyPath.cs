@@ -11,6 +11,9 @@ namespace UnityTools.EnemyPath
 
         public int Count => _waypoints.Count;
 
+        [SerializeField] private bool _lockWaypoints = true;
+        public bool LockWaypoints => _lockWaypoints;
+
         public Vector3 GetWaypoint(int index)
         {
             if (index < 0 || index >= _waypoints.Count)

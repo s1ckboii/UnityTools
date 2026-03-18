@@ -19,6 +19,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Icons", "Icons", "{B30692DF
 		..\..\Unity-projects\Project RF\Assets\Editor\Icons\lock_unlocked.png = ..\..\Unity-projects\Project RF\Assets\Editor\Icons\lock_unlocked.png
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EnemyPathGraph", "EnemyPathGraph", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		EnemyPathGraph.cs = EnemyPathGraph.cs
+		EnemyPathGraphEditor.cs = EnemyPathGraphEditor.cs
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -26,6 +32,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{E384EF84-AAE2-4C2D-8A97-BCF2C6D72BEC} = {FA392CE9-958F-4AAB-B804-74780A61AA73}
 		{B30692DF-A257-41DE-8202-3097CC96E328} = {FA392CE9-958F-4AAB-B804-74780A61AA73}
+		{02EA681E-C7D8-13C7-8484-4AC65E1B71E8} = {FA392CE9-958F-4AAB-B804-74780A61AA73}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {052428AB-5A23-4488-A191-445A87357924}

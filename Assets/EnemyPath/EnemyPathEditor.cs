@@ -1,9 +1,8 @@
-﻿using PlaceholderName.EnemyScripts;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 
-namespace PlaceholderName.EditorScripts
+namespace UnityTools.EnemyPath
 {
     [CanEditMultipleObjects]
     [CustomEditor(typeof(EnemyPath))]
