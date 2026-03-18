@@ -39,28 +39,18 @@ namespace UnityTools.EnemyPath
             return _nodes[index].connections;
         }
 
-        public int GetRandomConnected(int index)
-        {
-            var connections = GetConnections(index);
-
-            if (connections == null || connections.Count == 0)
-                return index;
-
-            return connections[Random.Range(0, connections.Count)];
-        }
-
         public void GenerateConnections()
         {
-            for (int i = 0; i < _nodes.Count; i++)
-            {
-                if (_nodes[i].point == null)
-                    continue;
+            float maxDist = _connectionRadius * 2f;
 
+            for (int i = 0; i < _nodes.Count; i++)
                 _nodes[i].connections.Clear();
 
-                for (int j = 0; j < _nodes.Count; j++)
+            for (int i = 0; i < _nodes.Count; i++)
+            {
+                for (int j = i + 1; j < _nodes.Count; j++)
                 {
-                    if (i == j || _nodes[j].point == null)
+                    if (_nodes[i].point == null || _nodes[j].point == null)
                         continue;
 
                     float dist = Vector3.Distance(
@@ -68,9 +58,10 @@ namespace UnityTools.EnemyPath
                         _nodes[j].point.position
                     );
 
-                    if (dist <= _connectionRadius)
+                    if (dist <= maxDist)
                     {
                         _nodes[i].connections.Add(j);
+                        _nodes[j].connections.Add(i);
                     }
                 }
             }
