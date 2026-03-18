@@ -23,7 +23,8 @@ The first tool I made is a simple Enemy Path script with cool editor design.
 Its Editor script though is a bit more interesting. It makes the script automatically register waypoints added as childobjects. Its locked by default,
 
 <img width="316" height="259" alt="image" src="https://github.com/user-attachments/assets/b797f51d-4bbd-4a02-a344-372681196bc2" />
-<img width="316" height="438" alt="image" src="https://github.com/user-attachments/assets/7d653dfd-1f68-49d1-8174-f4d8b3f04500" />
+<img width="316" height="465" alt="image" src="https://github.com/user-attachments/assets/25c61536-1425-4f8f-90f3-ae37dc8abade" />
+
 
 
 but you can unlock it if you'd like to move the order around. The order in the list changes the order for childobjects too, making the line refresh itself and properly change shape.
