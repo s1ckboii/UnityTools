@@ -7,7 +7,7 @@ namespace UnityTools.Editor.EnemyPaths
 {
     [CanEditMultipleObjects]
     [CustomEditor(typeof(EnemyGraphPath))]
-    public class EnemyGraphPathEditor : Editor
+    public class EnemyGraphPathEditor : UnityEditor.Editor
     {
         private EnemyGraphPath graph;
 
@@ -90,19 +90,19 @@ namespace UnityTools.Editor.EnemyPaths
             return string.Join(" ", input.ToUpper().ToCharArray());
         }
 
-        private readonly System.Collections.Generic.Dictionary<EnemyPathGraph, string> hierarchySignatures =
-            new System.Collections.Generic.Dictionary<EnemyPathGraph, string>();
+        private readonly System.Collections.Generic.Dictionary<EnemyGraphPath, string> hierarchySignatures =
+            new System.Collections.Generic.Dictionary<EnemyGraphPath, string>();
 
         private void OnEnable()
         {
-            graph = (EnemyPathGraph)target;
+            graph = (EnemyGraphPath)target;
             Refresh();
 
             hierarchySignatures.Clear();
 
             foreach (var t in targets)
             {
-                EnemyPathGraph g = (EnemyPathGraph)t;
+                EnemyGraphPath g = (EnemyGraphPath)t;
                 if (g != null)
                 {
                     hierarchySignatures[g] = GetHierarchySignature(g);
@@ -134,7 +134,7 @@ namespace UnityTools.Editor.EnemyPaths
 
             foreach (var t in targets)
             {
-                EnemyPathGraph g = (EnemyPathGraph)t;
+                EnemyGraphPath g = (EnemyGraphPath)t;
                 if (g == null) continue;
 
                 string newSignature = GetHierarchySignature(g);
@@ -464,7 +464,7 @@ namespace UnityTools.Editor.EnemyPaths
             }
         }
 
-        private string GetHierarchySignature(EnemyPathGraph g)
+        private string GetHierarchySignature(EnemyGraphPath g)
         {
             if (g == null) return "";
 
@@ -635,7 +635,7 @@ namespace UnityTools.Editor.EnemyPaths
         {
             foreach (var t in targets)
             {
-                EnemyPathGraph g = (EnemyPathGraph)t;
+                EnemyGraphPath g = (EnemyGraphPath)t;
 
                 var so = new SerializedObject(g);
                 var prop = so.FindProperty("_nodes");
@@ -653,7 +653,7 @@ namespace UnityTools.Editor.EnemyPaths
             }
         }
 
-        public static void DrawGraph(EnemyPathGraph graph)
+        public static void DrawGraph(EnemyGraphPath graph)
         {
             if (graph == null || graph.Count == 0 || !ShowGraph)
                 return;
@@ -738,11 +738,11 @@ namespace UnityTools.Editor.EnemyPaths
 
         private static void OnSceneGUI(SceneView sceneView)
         {
-            var graphs = Object.FindObjectsByType<EnemyPathGraph>(FindObjectsSortMode.None);
+            var graphs = Object.FindObjectsByType<EnemyGraphPath>(FindObjectsSortMode.None);
 
             foreach (var graph in graphs)
             {
-                EnemyPathGraphEditor.DrawGraph(graph);
+                EnemyGraphPathEditor.DrawGraph(graph);
             }
         }
     }
