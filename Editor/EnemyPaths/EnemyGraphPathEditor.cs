@@ -22,12 +22,9 @@ namespace UnityTools.Editor.EnemyPaths
         private static readonly string LockNodesKey = "EnemyPathGraph_LockNodes";
         private static readonly string ShowDiscsKey = "EnemyPathGraph_ShowDiscs";
         private static readonly string ShowLinesKey = "EnemyPathGraph_ShowLines";
-        private static readonly string ThemeKey = "EnemyPathGraphEditor_ThemeColor";
-        private static bool ShowGraph
-        {
-            get => EditorPrefs.GetBool(ShowGraphKey, true);
-            set => EditorPrefs.SetBool(ShowGraphKey, value);
-        }
+        private const string ColorKey = "EnemyGraphPath_Color";
+        private const string UseGlobalKey = "EnemyGraphPath_UseGlobal";
+        private Color ThemeColor => UnityToolsPreferences.GetColor(ColorKey, UnityToolsPreferences.GetUseGlobal(UseGlobalKey));
 
         private static bool LockNodes
         {
@@ -186,16 +183,39 @@ namespace UnityTools.Editor.EnemyPaths
             }
 
             ButtonStyle();
-
+            
             EditorGUILayout.Space(5);
 
-            Color newColor = EditorGUILayout.ColorField("Theme Color", ThemeColor);
+            bool useGlobal = UnityToolsPreferences.GetUseGlobal(UseGlobalKey);
+            bool newUseGlobal = EditorGUILayout.Toggle("Use Global Theme", useGlobal);
 
-            if (newColor != ThemeColor)
+            if (newUseGlobal != useGlobal)
             {
-                ThemeColor = newColor;
-                Repaint();
-                SceneView.RepaintAll();
+                UnityToolsPreferences.SetUseGlobal(UseGlobalKey, newUseGlobal);
+            }
+
+            if (!newUseGlobal)
+            {
+                Color local = UnityToolsPreferences.GetColor(ColorKey, false);
+
+                EditorGUI.BeginChangeCheck();
+                Color newLocal = EditorGUILayout.ColorField("Theme Color", local);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    UnityToolsPreferences.SetColor(ColorKey, newLocal);
+                    SceneView.RepaintAll();
+                    foreach (var w in Resources.FindObjectsOfTypeAll<EditorWindow>())
+                        w.Repaint();
+                }
+
+                if (GUILayout.Button("Reset Theme"))
+                {
+                    EditorPrefs.DeleteKey(ColorKey);
+                    EditorPrefs.DeleteKey(UseGlobalKey);
+                    SceneView.RepaintAll();
+                    foreach (var w in Resources.FindObjectsOfTypeAll<EditorWindow>())
+                        w.Repaint();
+                }
             }
 
             EditorGUILayout.Space(5);

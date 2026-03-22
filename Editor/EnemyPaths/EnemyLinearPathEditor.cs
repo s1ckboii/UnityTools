@@ -18,37 +18,9 @@ namespace UnityTools.Editor.EnemyPaths
 
         private ReorderableList waypointList;
 
-        private static readonly string ThemeKey = "EnemyPathEditor_ThemeColor";
-
-        private static Color ThemeColor
-        {
-            get
-            {
-                if (!EditorPrefs.HasKey(ThemeKey))
-                    return new Color(0.30f, 0.60f, 1f);
-
-                return StringToColor(EditorPrefs.GetString(ThemeKey));
-            }
-            set
-            {
-                EditorPrefs.SetString(ThemeKey, ColorToString(value));
-            }
-        }
-        private static string ColorToString(Color colorTheme)
-        {
-            return $"{colorTheme.r}|{colorTheme.g}|{colorTheme.b}|{colorTheme.a}";
-        }
-
-        private static Color StringToColor(string s)
-        {
-            var parts = s.Split('|');
-            return new Color(
-                float.Parse(parts[0]),
-                float.Parse(parts[1]),
-                float.Parse(parts[2]),
-                float.Parse(parts[3])
-            );
-        }
+        private const string ColorKey = "EnemyPath_Color";
+        private const string UseGlobalKey = "EnemyPath_UseGlobal";
+        private Color ThemeColor => UnityToolsPreferences.GetColor(ColorKey, UnityToolsPreferences.GetUseGlobal(UseGlobalKey));
         private static Color GetContrastColor(Color c)
         {
             float luminance = (0.299f * c.r + 0.587f * c.g + 0.114f * c.b);
@@ -156,13 +128,25 @@ namespace UnityTools.Editor.EnemyPaths
 
             EditorGUILayout.Space(5);
 
-            Color newColor = EditorGUILayout.ColorField("Theme Color", ThemeColor);
+            bool useGlobal = UnityToolsPreferences.GetUseGlobal(UseGlobalKey);
+            bool newUseGlobal = EditorGUILayout.Toggle("Use Global Theme", useGlobal);
 
-            if (newColor != ThemeColor)
+            if (newUseGlobal != useGlobal)
             {
-                ThemeColor = newColor;
-                Repaint();
-                SceneView.RepaintAll();
+                UnityToolsPreferences.SetUseGlobal(UseGlobalKey, newUseGlobal);
+            }
+
+            if (!newUseGlobal)
+            {
+                Color local = UnityToolsPreferences.GetColor(ColorKey, false);
+                Color newLocal = EditorGUILayout.ColorField("Theme Color", local);
+
+                if (newLocal != local)
+                {
+                    UnityToolsPreferences.SetColor(ColorKey, newLocal);
+                    Repaint();
+                    SceneView.RepaintAll();
+                }
             }
 
             EditorGUILayout.Space(5);
