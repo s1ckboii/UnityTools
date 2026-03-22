@@ -24,8 +24,12 @@ namespace UnityTools.Editor.EnemyPaths
         private static readonly string ShowLinesKey = "EnemyPathGraph_ShowLines";
         private const string ColorKey = "EnemyGraphPath_Color";
         private const string UseGlobalKey = "EnemyGraphPath_UseGlobal";
-        private Color ThemeColor => UnityToolsPreferences.GetColor(ColorKey, UnityToolsPreferences.GetUseGlobal(UseGlobalKey));
-
+        private static Color ThemeColor => UnityToolsPreferences.GetColor(ColorKey, UnityToolsPreferences.GetUseGlobal(UseGlobalKey));
+        private static bool ShowGraph
+        {
+            get => EditorPrefs.GetBool(ShowGraphKey, true);
+            set => EditorPrefs.SetBool(ShowGraphKey, value);
+        }
         private static bool LockNodes
         {
             get => EditorPrefs.GetBool(LockNodesKey, true);
@@ -41,20 +45,6 @@ namespace UnityTools.Editor.EnemyPaths
         {
             get => EditorPrefs.GetBool(ShowLinesKey, true);
             set => EditorPrefs.SetBool(ShowLinesKey, value);
-        }
-        private static Color ThemeColor
-        {
-            get
-            {
-                if (!EditorPrefs.HasKey(ThemeKey))
-                    return new Color(0.30f, 0.60f, 1f);
-
-                return StringToColor(EditorPrefs.GetString(ThemeKey));
-            }
-            set
-            {
-                EditorPrefs.SetString(ThemeKey, ColorToString(value));
-            }
         }
         private static string ColorToString(Color colorTheme)
         {
