@@ -197,15 +197,6 @@ namespace UnityTools.Editor.EnemyPaths
                     foreach (var w in Resources.FindObjectsOfTypeAll<EditorWindow>())
                         w.Repaint();
                 }
-
-                if (GUILayout.Button("Reset Theme"))
-                {
-                    EditorPrefs.DeleteKey(ColorKey);
-                    EditorPrefs.DeleteKey(UseGlobalKey);
-                    SceneView.RepaintAll();
-                    foreach (var w in Resources.FindObjectsOfTypeAll<EditorWindow>())
-                        w.Repaint();
-                }
             }
 
             EditorGUILayout.Space(5);

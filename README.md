@@ -4,6 +4,8 @@ You can now put these scripts in your unity using package manager's `Install pac
 
 `https://github.com/s1ckboii/UnityTools.git`
 
+You will see `Use Global Theme` in each component script, they are there so you can opt out of unified coloring (which you can find in `Edit` tab, `Preferences` and then `Unity Tools`)
+
 I will have some markdowns in each folder with pictures, detailed info on what they are, why are they good, etc.
 
 Markdowns in `Assets\` will describe what scripts you'll find in each folder that has the same name in Editor or Runtime.
